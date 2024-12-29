@@ -4,6 +4,23 @@ import crypto from 'crypto';
 
 const foodQualityBlockchain = new Blockchain();
 
+function calculateFreshnessScore(expiryDate) {
+  const today = new Date();
+  const expiry = new Date(expiryDate);
+  const diffInTime = expiry.getTime() - today.getTime();
+  const diffInDays = diffInTime / (1000 * 3600 * 24);
+
+  if (diffInDays >= 7) {
+    return 10;
+  } else if (diffInDays >= 3) {
+    return 8;
+  } else if (diffInDays >= 1) {
+    return 5;
+  } else {
+    return 1;
+  }
+}
+
 async function addIngredient(req, res) {
   try {
     const { name, description, origin, expiryDate, quantity } = req.body;
@@ -19,6 +36,8 @@ async function addIngredient(req, res) {
 
     await newIngredient.save();
 
+    const freshnessScore = calculateFreshnessScore(expiryDate);
+
     const transaction = {
       name: newIngredient.name,
       description: newIngredient.description,
@@ -26,13 +45,12 @@ async function addIngredient(req, res) {
       expiryDate: newIngredient.expiryDate,
       quantity: newIngredient.quantity,
       blockchainId: newIngredient.blockchainId,
-      qualityScore: "High",
+      qualityScore: freshnessScore,
       timestamp: Date.now(),
     };
 
     foodQualityBlockchain.createNewTransaction(transaction);
     const lastBlock = foodQualityBlockchain.getLastBlock();
-
     foodQualityBlockchain.addBlock();
 
     res.status(201).json({
@@ -57,11 +75,10 @@ async function getIngredients(req, res) {
 }
 
 async function getIngredientDetails(req, res) {
-  console.log(foodQualityBlockchain.getBlockchain());
-
   try {
     const { ingredientId } = req.params;
     const ingredient = await Ingredient.findOne({ blockchainId: ingredientId });
+
     if (!ingredient) {
       return res.status(404).json({ message: 'Ingredient not found.' });
     }
