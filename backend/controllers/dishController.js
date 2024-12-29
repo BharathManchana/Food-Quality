@@ -26,9 +26,21 @@ export const addDish = async (req, res) => {
 
 export const getDishes = async (req, res) => {
   try {
-    const dishes = await Dish.find().populate('ingredients', 'name description qualityScore');
-    res.status(200).json(dishes);
+    const dishes = await Dish.find();
+    const dishesWithIngredients = [];
+
+    for (let dish of dishes) {
+      const ingredients = await Ingredient.find({ blockchainId: { $in: dish.ingredients } });
+      
+      dishesWithIngredients.push({
+        ...dish.toObject(),
+        ingredients: ingredients
+      });
+    }
+
+    res.status(200).json(dishesWithIngredients);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error fetching dishes:', err);
+    res.status(500).json({ message: 'Error fetching dishes.' });
   }
 };
