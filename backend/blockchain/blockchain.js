@@ -27,7 +27,7 @@ class Blockchain {
 
   createNewTransaction(transaction) {
     this.pendingTransactions.push(transaction);
-    return this.pendingTransactions.length - 1;  // Return the index of the newly added transaction
+    return this.pendingTransactions.length - 1; 
   }
 
   addBlock() {
@@ -44,14 +44,12 @@ class Blockchain {
       ),
     };
     this.chain.push(newBlock);
-
-    // Clear the pending transactions after adding them to the block
     this.pendingTransactions = [];
     return newBlock;
   }
 
   getLastBlock() {
-    return this.chain[this.chain.length - 1];  // Return the last block in the chain
+    return this.chain[this.chain.length - 1];  
   }
 
   getBlockchain() {

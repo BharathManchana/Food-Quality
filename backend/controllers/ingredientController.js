@@ -8,7 +8,6 @@ async function addIngredient(req, res) {
   try {
     const { name, description, origin, expiryDate, quantity } = req.body;
 
-    // Create a new ingredient
     const newIngredient = new Ingredient({
       name,
       description,
@@ -18,10 +17,7 @@ async function addIngredient(req, res) {
       blockchainId: crypto.randomBytes(16).toString('hex'),
     });
 
-    // Save the ingredient to the database
     await newIngredient.save();
-
-    // Create a new transaction for the ingredient
     const transaction = {
       name: newIngredient.name,
       description: newIngredient.description,
@@ -31,16 +27,11 @@ async function addIngredient(req, res) {
       blockchainId: newIngredient.blockchainId,
     };
 
-    // Add the transaction to the blockchain
     const transactionIndex = foodQualityBlockchain.createNewTransaction(transaction);
-
-    // Get the last block from the blockchain
     const lastBlock = foodQualityBlockchain.getLastBlock();
 
-    // Create a new block and add it to the blockchain
-    foodQualityBlockchain.addBlock();
+    foodQualityBlockchain.addBlock(200, lastBlock['hash'], 'hash-example');
 
-    // Send response with the ingredient and blockchain transaction details
     res.status(201).json({
       message: 'Ingredient added successfully and recorded on the blockchain!',
       ingredient: newIngredient,
@@ -54,7 +45,7 @@ async function addIngredient(req, res) {
 
 async function getIngredients(req, res) {
   try {
-    // Fetch all ingredients from the database
+
     const ingredients = await Ingredient.find();
     res.status(200).json(ingredients);
   } catch (error) {
