@@ -1,7 +1,9 @@
 import crypto from 'crypto';
+
 class Blockchain {
   constructor() {
     this.chain = [];
+    this.pendingTransactions = [];  
     this.createGenesisBlock();
   }
 
@@ -23,21 +25,33 @@ class Blockchain {
       .digest('hex');
   }
 
-  addBlock(data) {
+  createNewTransaction(transaction) {
+    this.pendingTransactions.push(transaction);
+    return this.pendingTransactions.length - 1;  // Return the index of the newly added transaction
+  }
+
+  addBlock() {
     const previousBlock = this.chain[this.chain.length - 1];
     const newBlock = {
       index: this.chain.length,
       timestamp: Date.now(),
-      data,
+      data: this.pendingTransactions,  
       previousHash: previousBlock.hash,
       hash: this.calculateHash(
         this.chain.length,
-        data,
+        JSON.stringify(this.pendingTransactions), 
         previousBlock.hash
       ),
     };
     this.chain.push(newBlock);
+
+    // Clear the pending transactions after adding them to the block
+    this.pendingTransactions = [];
     return newBlock;
+  }
+
+  getLastBlock() {
+    return this.chain[this.chain.length - 1];  // Return the last block in the chain
   }
 
   getBlockchain() {
