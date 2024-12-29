@@ -27,7 +27,7 @@ class Blockchain {
 
   createNewTransaction(transaction) {
     this.pendingTransactions.push(transaction);
-    return this.pendingTransactions.length - 1; 
+    return this.pendingTransactions.length - 1;
   }
 
   addBlock() {
@@ -44,7 +44,7 @@ class Blockchain {
       ),
     };
     this.chain.push(newBlock);
-    this.pendingTransactions = [];
+    this.pendingTransactions = [];  
     return newBlock;
   }
 
@@ -54,6 +54,17 @@ class Blockchain {
 
   getBlockchain() {
     return this.chain;
+  }
+
+  getTransactionByBlockchainId(blockchainId) {
+    for (let block of this.chain) {
+      for (let transaction of block.data) {
+        if (transaction.blockchainId === blockchainId) {
+          return transaction;
+        }
+      }
+    }
+    return null;
   }
 }
 
