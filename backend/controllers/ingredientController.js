@@ -49,9 +49,9 @@ async function addIngredient(req, res) {
       timestamp: Date.now(),
     };
 
-    foodQualityBlockchain.createNewTransaction(transaction);
-    const lastBlock = foodQualityBlockchain.getLastBlock();
-    foodQualityBlockchain.addBlock();
+    await foodQualityBlockchain.createNewTransaction(transaction);
+
+    const lastBlock = await foodQualityBlockchain.addBlock();
 
     res.status(201).json({
       message: 'Ingredient added successfully and recorded on the blockchain!',
@@ -63,17 +63,14 @@ async function addIngredient(req, res) {
     res.status(500).json({ message: 'Error adding ingredient.' });
   }
 }
+
 async function getIngredients(req, res) {
   try {
     const ingredients = await Ingredient.find();
-    
+
     const ingredientsWithQualityScore = await Promise.all(
       ingredients.map(async (ingredient) => {
-        const blockchainData = foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
-        
-        if (!blockchainData) {
-          console.warn(`Blockchain data not found for ingredient: ${ingredient.name}`);
-        }
+        const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
 
         return {
           ...ingredient.toObject(),
@@ -92,13 +89,14 @@ async function getIngredients(req, res) {
 async function getIngredientDetails(req, res) {
   try {
     const { ingredientId } = req.params;
+
     const ingredient = await Ingredient.findOne({ blockchainId: ingredientId });
 
     if (!ingredient) {
       return res.status(404).json({ message: 'Ingredient not found.' });
     }
 
-    const blockchainData = foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+    const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
 
     if (!blockchainData) {
       console.warn(`Blockchain data not found for ingredient: ${ingredient.name}`);
@@ -118,6 +116,5 @@ async function getIngredientDetails(req, res) {
     res.status(500).json({ message: 'Error fetching ingredient details.' });
   }
 }
-
 
 export { addIngredient, getIngredients, getIngredientDetails };

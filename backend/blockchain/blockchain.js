@@ -1,15 +1,14 @@
 import crypto from 'crypto';
-import fs from 'fs';
+import BlockchainModel from '../models/blockchain.js';
 
 class Blockchain {
   constructor() {
     this.chain = [];
     this.pendingTransactions = [];
-    this.dataFile = 'blockchain_data.json';
     this.loadBlockchain();
   }
 
-  createGenesisBlock() {
+  async createGenesisBlock() {
     const block = {
       index: 0,
       timestamp: Date.now(),
@@ -18,6 +17,7 @@ class Blockchain {
       hash: this.calculateHash(0, 'Genesis Block', '0'),
     };
     this.chain.push(block);
+    await this.saveBlockchain();
   }
 
   calculateHash(index, data, previousHash) {
@@ -27,12 +27,12 @@ class Blockchain {
       .digest('hex');
   }
 
-  createNewTransaction(transaction) {
+  async createNewTransaction(transaction) {
     this.pendingTransactions.push(transaction);
     return this.pendingTransactions.length - 1;
   }
 
-  addBlock() {
+  async addBlock() {
     const previousBlock = this.chain[this.chain.length - 1];
     const newBlock = {
       index: this.chain.length,
@@ -47,11 +47,11 @@ class Blockchain {
     };
     this.chain.push(newBlock);
     this.pendingTransactions = [];
-    this.saveBlockchain();
+    await this.saveBlockchain();
     return newBlock;
   }
 
-  getLastBlock() {
+  async getLastBlock() {
     return this.chain[this.chain.length - 1];
   }
 
@@ -59,7 +59,7 @@ class Blockchain {
     return this.chain;
   }
 
-  getTransactionByBlockchainId(blockchainId) {
+  async getTransactionByBlockchainId(blockchainId) {
     for (let block of this.chain) {
       for (let transaction of block.data) {
         if (transaction.blockchainId === blockchainId) {
@@ -70,17 +70,20 @@ class Blockchain {
     return null;
   }
 
-  saveBlockchain() {
-    fs.writeFileSync(this.dataFile, JSON.stringify(this.chain, null, 2));
+  async saveBlockchain() {
+    await BlockchainModel.deleteMany({});
+    for (let block of this.chain) {
+      const newBlock = new BlockchainModel(block);
+      await newBlock.save();
+    }
   }
 
-  loadBlockchain() {
-    if (fs.existsSync(this.dataFile)) {
-      const data = fs.readFileSync(this.dataFile, 'utf-8');
-      this.chain = JSON.parse(data);
+  async loadBlockchain() {
+    const blocks = await BlockchainModel.find();
+    if (blocks.length === 0) {
+      await this.createGenesisBlock();
     } else {
-      this.createGenesisBlock();
-      this.saveBlockchain();
+      this.chain = blocks;
     }
   }
 }

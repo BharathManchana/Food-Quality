@@ -1,13 +1,13 @@
 import Dish from '../models/Dish.js';
 import Ingredient from '../models/Ingredient.js';
-import Blockchain from '../blockchain/blockchain.js'; 
+import Blockchain from '../blockchain/blockchain.js';
 
 const foodQualityBlockchain = new Blockchain();
-
 
 export const addDish = async (req, res) => {
   try {
     const { name, price, ingredientBlockchainIds } = req.body;
+
     const ingredients = await Ingredient.find({ blockchainId: { $in: ingredientBlockchainIds } });
 
     if (ingredients.length !== ingredientBlockchainIds.length) {
@@ -15,17 +15,22 @@ export const addDish = async (req, res) => {
     }
 
     let totalQualityScore = 0;
+    
     for (let ingredient of ingredients) {
-      const blockchainData = foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
-      totalQualityScore += blockchainData?.qualityScore || 0;
+      const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+      const qualityScore = blockchainData?.qualityScore || 0;
+      totalQualityScore += qualityScore;
     }
+
     const averageQualityScore = totalQualityScore / ingredients.length;
+
     const newDish = new Dish({
       name,
       price,
       qualityScore: averageQualityScore,
       ingredients: ingredientBlockchainIds,
     });
+
     await newDish.save();
 
     res.status(201).json({ message: 'Dish added successfully', dish: newDish });
@@ -34,6 +39,8 @@ export const addDish = async (req, res) => {
     res.status(500).json({ message: 'Error adding dish.' });
   }
 };
+
+
 export const getDishes = async (req, res) => {
   try {
     const dishes = await Dish.find();
@@ -41,9 +48,10 @@ export const getDishes = async (req, res) => {
 
     for (let dish of dishes) {
       const ingredients = await Ingredient.find({ blockchainId: { $in: dish.ingredients } });
+
       const ingredientsWithScores = await Promise.all(
         ingredients.map(async (ingredient) => {
-          const blockchainData = foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+          const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
           return {
             ...ingredient.toObject(),
             qualityScore: blockchainData?.qualityScore || 'N/A',
@@ -55,6 +63,7 @@ export const getDishes = async (req, res) => {
         (sum, ingredient) => sum + (ingredient.qualityScore || 0),
         0
       );
+
       const averageQualityScore = totalQualityScore / ingredientsWithScores.length;
 
       dishesWithIngredients.push({
