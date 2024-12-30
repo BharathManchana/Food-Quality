@@ -5,6 +5,7 @@ import userRoutes from './routes/userRoutes.js';
 import authMiddleware from './middleware/authMiddleware.js';  
 import dotenv from 'dotenv';  
 import dishRoutes from './routes/dishRoutes.js';
+import transcation from "./routes/trascationroutes.js"
 
 const app = express();
 dotenv.config();  
@@ -15,5 +16,6 @@ app.use(express.json());
 app.use('/api/ingredients', ingredientRoutes); 
 app.use('/api/users', userRoutes);  
 app.use('/api/dishes', dishRoutes);
+app.use('/api/transaction',transcation);
 
 export default app;

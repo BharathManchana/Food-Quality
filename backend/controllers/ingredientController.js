@@ -134,34 +134,34 @@ async function updateIngredient(req, res) {
       return res.status(404).json({ message: 'Ingredient not found.' });
     }
 
-    let hasChanges = false;
+    let updatedFields = [];
 
     if (name && name !== ingredient.name) {
       ingredient.name = name;
-      hasChanges = true;
+      updatedFields.push('name');
     }
 
     if (description && description !== ingredient.description) {
       ingredient.description = description;
-      hasChanges = true;
+      updatedFields.push('description');
     }
 
     if (origin && origin !== ingredient.origin) {
       ingredient.origin = origin;
-      hasChanges = true;
+      updatedFields.push('origin');
     }
 
     if (expiryDate && expiryDate !== ingredient.expiryDate) {
       ingredient.expiryDate = expiryDate;
-      hasChanges = true;
+      updatedFields.push('expiryDate');
     }
 
     if (quantity && quantity !== ingredient.quantity) {
       ingredient.quantity = quantity;
-      hasChanges = true;
+      updatedFields.push('quantity');
     }
 
-    if (hasChanges) {
+    if (updatedFields.length > 0) {
       await ingredient.save();
 
       const freshnessScore = calculateFreshnessScore(expiryDate);
@@ -171,9 +171,10 @@ async function updateIngredient(req, res) {
       if (blockchainData) {
         blockchainData.qualityScore = freshnessScore;
         blockchainData.timestamp = Date.now();
-        
-        await foodQualityBlockchain.createNewTransaction(blockchainData);
-        await foodQualityBlockchain.addBlock();
+        blockchainData.updatedFields = updatedFields; 
+
+
+        await foodQualityBlockchain.updateTransactionHistory(blockchainData);
 
         res.status(200).json({
           message: 'Ingredient updated successfully',
@@ -195,7 +196,6 @@ async function updateIngredient(req, res) {
     res.status(500).json({ message: 'Error updating ingredient.' });
   }
 }
-
 
 
 async function deleteIngredient(req, res) {
