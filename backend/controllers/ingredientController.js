@@ -75,15 +75,18 @@ async function getIngredients(req, res) {
 }
 
 async function getIngredientDetails(req, res) {
+  // console.log("Inside ingrdientcontrollers:Here is the req",req);
   try {
     const { ingredientId } = req.params;
     const ingredient = await Ingredient.findOne({ blockchainId: ingredientId });
+    console.log("This is ingredient in ingrdientcontrollers",ingredient);
 
     if (!ingredient) {
       return res.status(404).json({ message: 'Ingredient not found.' });
     }
 
     const blockchainData = foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+    console.log("This is blocchinaData:ingrdientcontrollers",blockchainData);
 
     res.status(200).json({
       name: ingredient.name,

@@ -1,10 +1,12 @@
 import crypto from 'crypto';
+import fs from 'fs';
 
 class Blockchain {
   constructor() {
     this.chain = [];
-    this.pendingTransactions = [];  
-    this.createGenesisBlock();
+    this.pendingTransactions = [];
+    this.dataFile = 'blockchain_data.json';
+    this.loadBlockchain();
   }
 
   createGenesisBlock() {
@@ -35,21 +37,22 @@ class Blockchain {
     const newBlock = {
       index: this.chain.length,
       timestamp: Date.now(),
-      data: this.pendingTransactions,  
+      data: this.pendingTransactions,
       previousHash: previousBlock.hash,
       hash: this.calculateHash(
         this.chain.length,
-        JSON.stringify(this.pendingTransactions), 
+        JSON.stringify(this.pendingTransactions),
         previousBlock.hash
       ),
     };
     this.chain.push(newBlock);
-    this.pendingTransactions = [];  
+    this.pendingTransactions = [];
+    this.saveBlockchain();
     return newBlock;
   }
 
   getLastBlock() {
-    return this.chain[this.chain.length - 1];  
+    return this.chain[this.chain.length - 1];
   }
 
   getBlockchain() {
@@ -65,6 +68,20 @@ class Blockchain {
       }
     }
     return null;
+  }
+
+  saveBlockchain() {
+    fs.writeFileSync(this.dataFile, JSON.stringify(this.chain, null, 2));
+  }
+
+  loadBlockchain() {
+    if (fs.existsSync(this.dataFile)) {
+      const data = fs.readFileSync(this.dataFile, 'utf-8');
+      this.chain = JSON.parse(data);
+    } else {
+      this.createGenesisBlock();
+      this.saveBlockchain();
+    }
   }
 }
 

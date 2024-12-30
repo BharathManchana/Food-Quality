@@ -1,0 +1,81 @@
+[
+  {
+    "index": 0,
+    "timestamp": 1735541436591,
+    "data": "Genesis Block",
+    "previousHash": "0",
+    "hash": "d894de287307c6e646599a69ef054fe0bf9c157e46d2d396232d320dbe326b3d"
+  },
+  {
+    "index": 1,
+    "timestamp": 1735541508987,
+    "data": [
+      {
+        "name": "Ing 1",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2024-12-31T00:00:00.000Z",
+        "quantity": 40,
+        "blockchainId": "f72ea9eccefb8c946c618c57a9963ed2",
+        "qualityScore": 1,
+        "timestamp": 1735541508987
+      }
+    ],
+    "previousHash": "d894de287307c6e646599a69ef054fe0bf9c157e46d2d396232d320dbe326b3d",
+    "hash": "01d758a68c3368bb0f32fba571fb2d94aa810e8d290a2506dbeeea2542e5c80f"
+  },
+  {
+    "index": 2,
+    "timestamp": 1735541538105,
+    "data": [
+      {
+        "name": "Ing 2",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2024-01-04T00:00:00.000Z",
+        "quantity": 100,
+        "blockchainId": "cc7a8acd1044a02614e0b64f15adec1b",
+        "qualityScore": 1,
+        "timestamp": 1735541538105
+      }
+    ],
+    "previousHash": "01d758a68c3368bb0f32fba571fb2d94aa810e8d290a2506dbeeea2542e5c80f",
+    "hash": "9860a806b5ebef030114d2d8185ee390ca73c00d4c3668cda672f60512b84700"
+  },
+  {
+    "index": 3,
+    "timestamp": 1735541571005,
+    "data": [
+      {
+        "name": "Ing 2",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-01-04T00:00:00.000Z",
+        "quantity": 100,
+        "blockchainId": "ff0480e518cae4bdbaba7eef91d143ec",
+        "qualityScore": 8,
+        "timestamp": 1735541571005
+      }
+    ],
+    "previousHash": "9860a806b5ebef030114d2d8185ee390ca73c00d4c3668cda672f60512b84700",
+    "hash": "eeb9fe2b5eab3d606ca11352742b71f97c41ec38f04e828ec5b19afe8991f8c5"
+  },
+  {
+    "index": 4,
+    "timestamp": 1735541588264,
+    "data": [
+      {
+        "name": "Ing 3",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-12-04T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "c85415580f504eae40e8eaa9c32778bc",
+        "qualityScore": 10,
+        "timestamp": 1735541588264
+      }
+    ],
+    "previousHash": "eeb9fe2b5eab3d606ca11352742b71f97c41ec38f04e828ec5b19afe8991f8c5",
+    "hash": "d9241253b3a2dea6c9d8cfe140c5ffee381bfd32d2439b6112e1cc71b448cca6"
+  }
+]
