@@ -206,3 +206,52 @@ export const deleteDish = async (req, res) => {
     res.status(500).json({ message: 'Error deleting dish.' });
   }
 };
+
+export const getDishHistory = async (req, res) => {
+  try {
+    const { dishId } = req.params; 
+    const dish = await Dish.findById(dishId);
+    if (!dish) {
+      return res.status(404).json({ message: 'Dish not found.' });
+    }
+    const dishHistory = [];
+    for (let ingredientBlockchainId of dish.ingredients) {
+      const ingredient = await Ingredient.findOne({ blockchainId: ingredientBlockchainId });
+      if (ingredient) {
+        const ingredientHistory = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+
+        if (ingredientHistory) {
+          const previousState = ingredientHistory.updatedFields && ingredientHistory.updatedFields.length
+            ? {
+                ...ingredientHistory,
+                name: ingredientHistory.name, 
+                expiryDate: ingredientHistory.expiryDate, 
+              }
+            : null;
+          dishHistory.push({
+            ingredient,
+            previousState,
+            currentState: {
+              name: ingredient.name,
+              description: ingredient.description,
+              origin: ingredient.origin,
+              expiryDate: ingredient.expiryDate,
+              quantity: ingredient.quantity,
+              blockchainId: ingredient.blockchainId,
+              createdAt: ingredient.createdAt,
+            },
+            history: ingredientHistory,
+          });
+        }
+      }
+    }
+
+    res.status(200).json({
+      dish,
+      dishHistory,
+    });
+  } catch (err) {
+    console.error('Error fetching dish history:', err);
+    res.status(500).json({ message: 'Error fetching dish history.' });
+  }
+};
