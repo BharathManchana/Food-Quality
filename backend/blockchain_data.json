@@ -77,5 +77,59 @@
     ],
     "previousHash": "eeb9fe2b5eab3d606ca11352742b71f97c41ec38f04e828ec5b19afe8991f8c5",
     "hash": "d9241253b3a2dea6c9d8cfe140c5ffee381bfd32d2439b6112e1cc71b448cca6"
+  },
+  {
+    "index": 5,
+    "timestamp": 1735543077735,
+    "data": [
+      {
+        "name": "Ing 1 12:47",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-01-01T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "d5737b081c1c312715f27b0f5862faaa",
+        "qualityScore": 5,
+        "timestamp": 1735543077735
+      }
+    ],
+    "previousHash": "d9241253b3a2dea6c9d8cfe140c5ffee381bfd32d2439b6112e1cc71b448cca6",
+    "hash": "0a0d61c9a4879106fc00018300499a04ccf5e6a6870dbe26a932980fa66e0a02"
+  },
+  {
+    "index": 6,
+    "timestamp": 1735543095701,
+    "data": [
+      {
+        "name": "Ing 2 12:48",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-12-01T00:00:00.000Z",
+        "quantity": 500,
+        "blockchainId": "025bb989d234e8c9eb862ac397e21c89",
+        "qualityScore": 10,
+        "timestamp": 1735543095701
+      }
+    ],
+    "previousHash": "0a0d61c9a4879106fc00018300499a04ccf5e6a6870dbe26a932980fa66e0a02",
+    "hash": "364f5fe27dd8c3085774813f00de7984b6cc499dfc093d0dc43044481107807b"
+  },
+  {
+    "index": 7,
+    "timestamp": 1735543301698,
+    "data": [
+      {
+        "name": "Ing 3 12:51",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2024-12-31T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "035920f7823e0a03e3188395c1984763",
+        "qualityScore": 1,
+        "timestamp": 1735543301698
+      }
+    ],
+    "previousHash": "364f5fe27dd8c3085774813f00de7984b6cc499dfc093d0dc43044481107807b",
+    "hash": "cb43703f5de4794c74f60ce245e8a9172f7361a702fed241a4cd52a07e11dfae"
   }
 ]
