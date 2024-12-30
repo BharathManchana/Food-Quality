@@ -71,13 +71,18 @@ async function getIngredients(req, res) {
     const ingredientsWithQualityScore = await Promise.all(
       ingredients.map(async (ingredient) => {
         const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
-        console.log("Blochcaindata",blockchainData);
+        
+        if (!blockchainData) {
+          console.warn(`Blockchain data not found for ingredient: ${ingredient.name}`);
+        }
+    
         return {
           ...ingredient.toObject(),
           qualityScore: blockchainData?.qualityScore || 'N/A',
         };
       })
     );
+    
 
     res.status(200).json(ingredientsWithQualityScore);
   } catch (error) {
@@ -85,6 +90,7 @@ async function getIngredients(req, res) {
     res.status(500).json({ message: 'Error fetching ingredients.' });
   }
 }
+
 
 async function getIngredientDetails(req, res) {
   try {
@@ -159,36 +165,37 @@ async function updateIngredient(req, res) {
       await ingredient.save();
 
       const freshnessScore = calculateFreshnessScore(expiryDate);
-      const blockchainData = {
-        name: ingredient.name,
-        description: ingredient.description,
-        origin: ingredient.origin,
-        expiryDate: ingredient.expiryDate,
-        quantity: ingredient.quantity,
-        blockchainId: ingredient.blockchainId,
-        qualityScore: freshnessScore,
-        timestamp: Date.now(),
-      };
 
-      await foodQualityBlockchain.createNewTransaction(blockchainData);
-      await foodQualityBlockchain.addBlock();
+      const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
 
-      res.status(200).json({
-        message: 'Ingredient updated successfully',
-        ingredient,
-        blockchainTransaction: blockchainData,
-      });
+      if (blockchainData) {
+        blockchainData.qualityScore = freshnessScore;
+        blockchainData.timestamp = Date.now();
+        
+        await foodQualityBlockchain.createNewTransaction(blockchainData);
+        await foodQualityBlockchain.addBlock();
+
+        res.status(200).json({
+          message: 'Ingredient updated successfully',
+          ingredient,
+          blockchainTransaction: blockchainData,
+        });
+      } else {
+        res.status(404).json({
+          message: 'Blockchain data not found for the ingredient.',
+        });
+      }
     } else {
       res.status(200).json({
         message: 'No changes detected for the ingredient.',
       });
     }
-
   } catch (error) {
     console.error('Error updating ingredient:', error);
     res.status(500).json({ message: 'Error updating ingredient.' });
   }
 }
+
 
 
 async function deleteIngredient(req, res) {

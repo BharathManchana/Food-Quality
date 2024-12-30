@@ -5,6 +5,7 @@ import crypto from 'crypto';
 
 const foodQualityBlockchain = new Blockchain();
 
+// Calculate freshness score based on expiry date
 function calculateFreshnessScore(expiryDate) {
   const today = new Date();
   const expiry = new Date(expiryDate);
@@ -22,6 +23,7 @@ function calculateFreshnessScore(expiryDate) {
   }
 }
 
+// Add a new dish
 export const addDish = async (req, res) => {
   try {
     const { name, price, ingredientBlockchainIds } = req.body;
@@ -69,6 +71,7 @@ export const addDish = async (req, res) => {
   }
 };
 
+// Get all dishes with their ingredients and quality score
 export const getDishes = async (req, res) => {
   try {
     const dishes = await Dish.find();
@@ -106,6 +109,7 @@ export const getDishes = async (req, res) => {
   }
 };
 
+// Update an existing dish
 export const updateDish = async (req, res) => {
   try {
     const { dishId } = req.params;
@@ -152,6 +156,7 @@ export const updateDish = async (req, res) => {
   }
 };
 
+// Delete a dish
 export const deleteDish = async (req, res) => {
   try {
     const { dishId } = req.params;
