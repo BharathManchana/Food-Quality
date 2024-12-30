@@ -45,11 +45,13 @@ class Blockchain {
         previousBlock.hash
       ),
     };
+    
     this.chain.push(newBlock);
     this.pendingTransactions = [];
     await this.saveBlockchain();
     return newBlock;
   }
+  
 
   async getLastBlock() {
     return this.chain[this.chain.length - 1];
@@ -71,12 +73,17 @@ class Blockchain {
   }
 
   async saveBlockchain() {
-    await BlockchainModel.deleteMany({});
     for (let block of this.chain) {
-      const newBlock = new BlockchainModel(block);
-      await newBlock.save();
+      const existingBlock = await BlockchainModel.findOne({ index: block.index });
+      if (existingBlock) {
+        await BlockchainModel.updateOne({ index: block.index }, block);
+      } else {
+        const newBlock = new BlockchainModel(block);
+        await newBlock.save();
+      }
     }
   }
+  
 
   async loadBlockchain() {
     const blocks = await BlockchainModel.find();

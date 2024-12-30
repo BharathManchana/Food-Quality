@@ -71,7 +71,7 @@ async function getIngredients(req, res) {
     const ingredientsWithQualityScore = await Promise.all(
       ingredients.map(async (ingredient) => {
         const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
-
+        console.log("Blochcaindata",blockchainData);
         return {
           ...ingredient.toObject(),
           qualityScore: blockchainData?.qualityScore || 'N/A',
@@ -117,4 +117,108 @@ async function getIngredientDetails(req, res) {
   }
 }
 
-export { addIngredient, getIngredients, getIngredientDetails };
+async function updateIngredient(req, res) {
+  try {
+    const { ingredientId } = req.params;
+    const { name, description, origin, expiryDate, quantity } = req.body;
+
+    const ingredient = await Ingredient.findOne({ blockchainId: ingredientId });
+
+    if (!ingredient) {
+      return res.status(404).json({ message: 'Ingredient not found.' });
+    }
+
+    let hasChanges = false;
+
+    if (name && name !== ingredient.name) {
+      ingredient.name = name;
+      hasChanges = true;
+    }
+
+    if (description && description !== ingredient.description) {
+      ingredient.description = description;
+      hasChanges = true;
+    }
+
+    if (origin && origin !== ingredient.origin) {
+      ingredient.origin = origin;
+      hasChanges = true;
+    }
+
+    if (expiryDate && expiryDate !== ingredient.expiryDate) {
+      ingredient.expiryDate = expiryDate;
+      hasChanges = true;
+    }
+
+    if (quantity && quantity !== ingredient.quantity) {
+      ingredient.quantity = quantity;
+      hasChanges = true;
+    }
+
+    if (hasChanges) {
+      await ingredient.save();
+
+      const freshnessScore = calculateFreshnessScore(expiryDate);
+      const blockchainData = {
+        name: ingredient.name,
+        description: ingredient.description,
+        origin: ingredient.origin,
+        expiryDate: ingredient.expiryDate,
+        quantity: ingredient.quantity,
+        blockchainId: ingredient.blockchainId,
+        qualityScore: freshnessScore,
+        timestamp: Date.now(),
+      };
+
+      await foodQualityBlockchain.createNewTransaction(blockchainData);
+      await foodQualityBlockchain.addBlock();
+
+      res.status(200).json({
+        message: 'Ingredient updated successfully',
+        ingredient,
+        blockchainTransaction: blockchainData,
+      });
+    } else {
+      res.status(200).json({
+        message: 'No changes detected for the ingredient.',
+      });
+    }
+
+  } catch (error) {
+    console.error('Error updating ingredient:', error);
+    res.status(500).json({ message: 'Error updating ingredient.' });
+  }
+}
+
+
+async function deleteIngredient(req, res) {
+  try {
+    const { ingredientId } = req.params;
+
+    const ingredient = await Ingredient.findOneAndDelete({ blockchainId: ingredientId });
+
+    if (!ingredient) {
+      return res.status(404).json({ message: 'Ingredient not found.' });
+    }
+
+    const blockchainData = {
+      blockchainId: ingredient.blockchainId,
+      action: 'delete',
+      timestamp: Date.now(),
+    };
+
+    await foodQualityBlockchain.createNewTransaction(blockchainData);
+    const lastBlock = await foodQualityBlockchain.addBlock();
+
+    res.status(200).json({
+      message: 'Ingredient deleted successfully from database and blockchain.',
+      ingredient,
+    });
+  } catch (error) {
+    console.error('Error deleting ingredient:', error);
+    res.status(500).json({ message: 'Error deleting ingredient.' });
+  }
+}
+
+
+export { addIngredient, getIngredients, getIngredientDetails,updateIngredient,deleteIngredient};
