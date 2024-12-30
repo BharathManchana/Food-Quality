@@ -131,5 +131,131 @@
     ],
     "previousHash": "364f5fe27dd8c3085774813f00de7984b6cc499dfc093d0dc43044481107807b",
     "hash": "cb43703f5de4794c74f60ce245e8a9172f7361a702fed241a4cd52a07e11dfae"
+  },
+  {
+    "index": 8,
+    "timestamp": 1735543400000,
+    "data": [
+      {
+        "name": "Ing 1 13:21",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2024-12-30T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "9ae5fe53a969c89d896739467e672ab4",
+        "qualityScore": "N/A",
+        "timestamp": 1735543400000
+      }
+    ],
+    "previousHash": "cb43703f5de4794c74f60ce245e8a9172f7361a702fed241a4cd52a07e11dfae",
+    "hash": "c4e70d767b38a1d849606a11f178d1782092450fffb78e43ac2ad8d4db1ecf73"
+  },
+  {
+    "index": 9,
+    "timestamp": 1735543500000,
+    "data": [
+      {
+        "name": "Ing 2 13:22",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2024-12-31T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "f226d21b7afce9f53477b81c0f6dac10",
+        "qualityScore": 3,
+        "timestamp": 1735543500000
+      }
+    ],
+    "previousHash": "c4e70d767b38a1d849606a11f178d1782092450fffb78e43ac2ad8d4db1ecf73",
+    "hash": "2b9d5d9c1ef35a9c82c2f9da49bca883cf6b7d8d3a7427e2d6bcd6d1a8a2679f9"
+  },
+  {
+    "index": 10,
+    "timestamp": 1735543600000,
+    "data": [
+      {
+        "name": "Ing 3 13:22",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-01-01T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "122c5a18ab658c701d5ed278b5968bff",
+        "qualityScore": 5,
+        "timestamp": 1735543600000
+      }
+    ],
+    "previousHash": "2b9d5d9c1ef35a9c82c2f9da49bca883cf6b7d8d3a7427e2d6bcd6d1a8a2679f9",
+    "hash": "5b139497c28a8fcbe96c4047681a8704b5a7e8c1d89a21d5f9b24e742ac98c71"
+  },
+  {
+    "index": 11,
+    "timestamp": 1735543700000,
+    "data": [
+      {
+        "name": "Ing 4 13:22",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-01-03T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "cd080c563d3285b6b59231e24888ff18",
+        "qualityScore": 8,
+        "timestamp": 1735543700000
+      }
+    ],
+    "previousHash": "5b139497c28a8fcbe96c4047681a8704b5a7e8c1d89a21d5f9b24e742ac98c71",
+    "hash": "9b1e58ba4289b75e1e9eb9b5598f24e19d7be466b9b1f48d8ee70ecb8ac5ac79"
+  },
+  {
+    "index": 12,
+    "timestamp": 1735543800000,
+    "data": [
+      {
+        "name": "Ing 5 13:22",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-01-05T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "fb3904e17e3cc3da8a87e874227cef74",
+        "qualityScore": 8,
+        "timestamp": 1735543800000
+      }
+    ],
+    "previousHash": "9b1e58ba4289b75e1e9eb9b5598f24e19d7be466b9b1f48d8ee70ecb8ac5ac79",
+    "hash": "59e87e4bdbb23467b71f9c0147a4c24c79d9e9f4776be9a7e469c9c6259a1299"
+  },
+  {
+    "index": 13,
+    "timestamp": 1735543900000,
+    "data": [
+      {
+        "name": "Ing 6 13:22",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-01-06T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "a1e13695bc688665d285622363f70594",
+        "qualityScore": 8,
+        "timestamp": 1735543900000
+      }
+    ],
+    "previousHash": "59e87e4bdbb23467b71f9c0147a4c24c79d9e9f4776be9a7e469c9c6259a1299",
+    "hash": "902c88b6c7c8ac9e456585d9ccebe2b2859ac70c33f941be3e7b80e71b28c2b7"
+  },
+  {
+    "index": 14,
+    "timestamp": 1735544000000,
+    "data": [
+      {
+        "name": "Ing 7 13:22",
+        "description": "Fresh fram",
+        "origin": "vegetable field",
+        "expiryDate": "2025-01-07T00:00:00.000Z",
+        "quantity": 50,
+        "blockchainId": "f16290ea7f3f39c4750eeef7133ee2a5",
+        "qualityScore": 10,
+        "timestamp": 1735544000000
+      }
+    ],
+    "previousHash": "902c88b6c7c8ac9e456585d9ccebe2b2859ac70c33f941be3e7b80e71b28c2b7",
+    "hash": "a6c3ef4e522fdc2be653211402e3ed617f8726253f3c7ff1985921ad3ae10a3"
   }
 ]

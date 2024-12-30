@@ -71,6 +71,10 @@ async function getIngredients(req, res) {
       ingredients.map(async (ingredient) => {
         const blockchainData = foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
         
+        if (!blockchainData) {
+          console.warn(`Blockchain data not found for ingredient: ${ingredient.name}`);
+        }
+
         return {
           ...ingredient.toObject(),
           qualityScore: blockchainData?.qualityScore || 'N/A',
@@ -85,7 +89,6 @@ async function getIngredients(req, res) {
   }
 }
 
-
 async function getIngredientDetails(req, res) {
   try {
     const { ingredientId } = req.params;
@@ -96,6 +99,10 @@ async function getIngredientDetails(req, res) {
     }
 
     const blockchainData = foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+
+    if (!blockchainData) {
+      console.warn(`Blockchain data not found for ingredient: ${ingredient.name}`);
+    }
 
     res.status(200).json({
       name: ingredient.name,
@@ -111,5 +118,6 @@ async function getIngredientDetails(req, res) {
     res.status(500).json({ message: 'Error fetching ingredient details.' });
   }
 }
+
 
 export { addIngredient, getIngredients, getIngredientDetails };
