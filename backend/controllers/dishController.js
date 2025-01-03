@@ -142,6 +142,11 @@ export const updateDish = async (req, res) => {
     }
 
     let updatedFields = [];
+    const previousState = {
+      name: dish.name,
+      price: dish.price,
+      ingredients: dish.ingredients,
+    };
 
     if (name && name !== dish.name) {
       dish.name = name;
@@ -185,6 +190,7 @@ export const updateDish = async (req, res) => {
         ingredients: dish.ingredients,
         qualityScore: dish.qualityScore,
         updatedFields,
+        previousState,
         timestamp: Date.now(),
       };
 
@@ -243,45 +249,65 @@ export const getDishHistory = async (req, res) => {
       return res.status(404).json({ message: 'Dish not found.' });
     }
 
-    const dishHistory = [];
+    const dishStateHistory = await foodQualityBlockchain.getTransactionByBlockchainId(dish.blockchainId);
+    const currentDishState = {
+      name: dish.name,
+      price: dish.price,
+      ingredients: dish.ingredients,
+      blockchainId: dish.blockchainId,
+      timestamp: Date.now(),
+    };
 
-    for (let ingredientBlockchainId of dish.ingredients) {
+    const dishHistory = {
+      previousState: dishStateHistory,
+      currentState: currentDishState,
+    };
+
+    const ingredientHistories = await Promise.all(dish.ingredients.map(async (ingredientBlockchainId) => {
       const ingredient = await Ingredient.findOne({ blockchainId: ingredientBlockchainId });
-
       if (ingredient) {
         const ingredientHistory = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
-
-        if (ingredientHistory) {
-          const previousState = ingredientHistory.updatedFields?.length
-            ? {
-                ...ingredientHistory,
-                name: ingredientHistory.name,
-                expiryDate: ingredientHistory.expiryDate,
-              }
-            : null;
-
-          dishHistory.push({
-            ingredient,
-            previousState,
-            currentState: {
-              name: ingredient.name,
-              description: ingredient.description,
-              origin: ingredient.origin,
-              expiryDate: ingredient.expiryDate,
-              quantity: ingredient.quantity,
-              blockchainId: ingredient.blockchainId,
-              createdAt: ingredient.createdAt,
-            },
-            history: ingredientHistory,
-          });
-        }
+        return {
+          ingredient,
+          previousState: ingredientHistory,
+          currentState: {
+            name: ingredient.name,
+            description: ingredient.description,
+            origin: ingredient.origin,
+            expiryDate: ingredient.expiryDate,
+            quantity: ingredient.quantity,
+            blockchainId: ingredient.blockchainId,
+            createdAt: ingredient.createdAt,
+          },
+        };
       }
-    }
+      return null;
+    }));
 
-    res.status(200).json({
-      dish,
-      dishHistory,
-    });
+    const updatedFields = [];
+    if (dishStateHistory.name !== currentDishState.name) updatedFields.push("name");
+    if (dishStateHistory.price !== currentDishState.price) updatedFields.push("price");
+    if (JSON.stringify(dishStateHistory.ingredients) !== JSON.stringify(currentDishState.ingredients)) updatedFields.push("ingredients");
+
+    const formattedHistory = {
+      message: "Dish updated successfully",
+      dish: currentDishState,
+      blockchainTransaction: {
+        ...currentDishState,
+        action: "update",
+        qualityScore: dish.qualityScore,
+        updatedFields,
+        previousState: {
+          name: dishStateHistory.name,
+          price: dishStateHistory.price,
+          ingredients: dishStateHistory.ingredients,
+        },
+        timestamp: Date.now(),
+      },
+      ingredientHistories: ingredientHistories.filter(history => history !== null),
+    };
+
+    res.status(200).json(formattedHistory);
   } catch (err) {
     console.error('Error fetching dish history:', err);
     res.status(500).json({ message: 'Error fetching dish history.' });
