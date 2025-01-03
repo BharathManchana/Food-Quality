@@ -95,7 +95,6 @@ async function getIngredients(req, res) {
 async function getIngredientDetails(req, res) {
   try {
     const { ingredientId } = req.params;
-
     const ingredient = await Ingredient.findOne({ blockchainId: ingredientId });
 
     if (!ingredient) {

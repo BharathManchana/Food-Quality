@@ -5,7 +5,6 @@ const foodQualityBlockchain = new Blockchain();
 export const getBlockchainData = async (req, res) => {
   try {
     const blockchainData = await foodQualityBlockchain.getAllTransactions();
-    console.log("The block chain data in trascationcontrollers:",blockchainData);
     const detailedBlockchainData = blockchainData
       .filter(transaction => Object.keys(transaction).length > 0)
       .map(transaction => ({
