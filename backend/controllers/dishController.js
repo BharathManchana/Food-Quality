@@ -206,25 +206,21 @@ export const updateDish = async (req, res) => {
   }
 };
 
-
 export const deleteDish = async (req, res) => {
   try {
     const { dishId } = req.params;
 
-    // Find and delete the dish using blockchainId instead of dishId
     const dish = await Dish.findOneAndDelete({ blockchainId: dishId });
     if (!dish) {
       return res.status(404).json({ message: 'Dish not found.' });
     }
 
-    // Prepare blockchain data for deletion
     const blockchainData = {
       blockchainId: dish.blockchainId,
       action: 'delete',
       timestamp: Date.now(),
     };
 
-    // Create a new transaction and add a block to the blockchain
     await foodQualityBlockchain.createNewTransaction(blockchainData);
     await foodQualityBlockchain.addBlock();
 
@@ -242,7 +238,6 @@ export const getDishHistory = async (req, res) => {
   try {
     const { dishId } = req.params;
 
-    // Find the dish using blockchainId instead of MongoDB _id
     const dish = await Dish.findOne({ blockchainId: dishId });
     if (!dish) {
       return res.status(404).json({ message: 'Dish not found.' });
@@ -250,7 +245,6 @@ export const getDishHistory = async (req, res) => {
 
     const dishHistory = [];
 
-    // Loop through the dish's ingredients, which are stored as blockchainIds
     for (let ingredientBlockchainId of dish.ingredients) {
       const ingredient = await Ingredient.findOne({ blockchainId: ingredientBlockchainId });
 
