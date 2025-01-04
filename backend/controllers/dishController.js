@@ -97,7 +97,7 @@ export const getDishes = async (req, res) => {
           const freshnessScore = calculateFreshnessScore(ingredient.expiryDate);
           return {
             ...ingredient.toObject(),
-            qualityScore: blockchainData?.qualityScore || 'N/A',
+            qualityScore: calculateFreshnessScore(ingredient.expiryDate),
             blockchainTimestamp: blockchainData?.timestamp || 'N/A',
             freshnessScore,
           };
@@ -125,10 +125,10 @@ export const getDishes = async (req, res) => {
     }
 
     res.status(200).json(dishesWithIngredients);
-  } catch (err) {
-    console.error('Error fetching dishes:', err);
-    res.status(500).json({ message: 'Error fetching dishes.' });
-  }
+  } catch (err) {     
+    console.error('Error fetching dishes:', err);     
+    res.status(500).json({ message: 'Error fetching dishes.' });   
+}
 };
 
 export const updateDish = async (req, res) => {

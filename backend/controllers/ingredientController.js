@@ -78,7 +78,7 @@ async function getIngredients(req, res) {
     
         return {
           ...ingredient.toObject(),
-          qualityScore: blockchainData?.qualityScore || 'N/A',
+          qualityScore: blockchainData ? calculateFreshnessScore(ingredient.expiryDate) : 'N/A',
         };
       })
     );
@@ -90,7 +90,6 @@ async function getIngredients(req, res) {
     res.status(500).json({ message: 'Error fetching ingredients.' });
   }
 }
-
 
 async function getIngredientDetails(req, res) {
   try {
@@ -113,7 +112,7 @@ async function getIngredientDetails(req, res) {
       origin: ingredient.origin,
       expiryDate: ingredient.expiryDate,
       quantity: ingredient.quantity,
-      qualityScore: blockchainData?.qualityScore || 'N/A',
+      qualityScore: blockchainData ? calculateFreshnessScore(ingredient.expiryDate) : 'N/A',
       blockchainTimestamp: blockchainData?.timestamp || 'N/A',
     });
   } catch (error) {
@@ -164,14 +163,12 @@ async function updateIngredient(req, res) {
       await ingredient.save();
 
       const freshnessScore = calculateFreshnessScore(expiryDate);
-
       const blockchainData = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
 
       if (blockchainData) {
         blockchainData.qualityScore = freshnessScore;
         blockchainData.timestamp = Date.now();
         blockchainData.updatedFields = updatedFields; 
-
 
         await foodQualityBlockchain.updateTransactionHistory(blockchainData);
 
@@ -196,11 +193,9 @@ async function updateIngredient(req, res) {
   }
 }
 
-
 async function deleteIngredient(req, res) {
   try {
     const { ingredientId } = req.params;
-
     const ingredient = await Ingredient.findOneAndDelete({ blockchainId: ingredientId });
 
     if (!ingredient) {
@@ -226,5 +221,4 @@ async function deleteIngredient(req, res) {
   }
 }
 
-
-export { addIngredient, getIngredients, getIngredientDetails,updateIngredient,deleteIngredient};
+export { addIngredient, getIngredients, getIngredientDetails, updateIngredient, deleteIngredient };
