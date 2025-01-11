@@ -258,15 +258,11 @@ export const getDishHistory = async (req, res) => {
       timestamp: Date.now(),
     };
 
-    const dishHistory = {
-      previousState: dishStateHistory,
-      currentState: currentDishState,
-    };
-
     const ingredientHistories = await Promise.all(dish.ingredients.map(async (ingredientBlockchainId) => {
       const ingredient = await Ingredient.findOne({ blockchainId: ingredientBlockchainId });
       if (ingredient) {
         const ingredientHistory = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+        const freshnessScore = calculateFreshnessScore(ingredient.expiryDate);
         return {
           ingredient,
           previousState: ingredientHistory,
@@ -278,6 +274,7 @@ export const getDishHistory = async (req, res) => {
             quantity: ingredient.quantity,
             blockchainId: ingredient.blockchainId,
             createdAt: ingredient.createdAt,
+            freshnessScore, 
           },
         };
       }
