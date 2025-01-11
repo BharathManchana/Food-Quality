@@ -250,36 +250,50 @@ export const getDishHistory = async (req, res) => {
     }
 
     const dishStateHistory = await foodQualityBlockchain.getTransactionByBlockchainId(dish.blockchainId);
+
+    const ingredients = await Ingredient.find({ blockchainId: { $in: dish.ingredients } });
+    const ingredientHistories = await Promise.all(ingredients.map(async (ingredient) => {
+      const ingredientHistory = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
+      const freshnessScore = calculateFreshnessScore(ingredient.expiryDate);
+      const qualityScore = ingredientHistory?.qualityScore || 0;
+      return {
+        ingredient,
+        previousState: ingredientHistory,
+        currentState: {
+          name: ingredient.name,
+          description: ingredient.description,
+          origin: ingredient.origin,
+          expiryDate: ingredient.expiryDate,
+          quantity: ingredient.quantity,
+          blockchainId: ingredient.blockchainId,
+          createdAt: ingredient.createdAt,
+          freshnessScore,
+          qualityScore,
+        },
+      };
+    }));
+
+    const totalQualityScore = ingredientHistories.reduce(
+      (sum, ingredientHistory) => sum + (ingredientHistory?.currentState?.qualityScore || 0),
+      0
+    );
+    const totalFreshnessScore = ingredientHistories.reduce(
+      (sum, ingredientHistory) => sum + (ingredientHistory?.currentState?.freshnessScore || 0),
+      0
+    );
+
+    const averageQualityScore = totalQualityScore / ingredientHistories.length;
+    const averageFreshnessScore = totalFreshnessScore / ingredientHistories.length;
+    const dishQualityScore = (averageQualityScore + averageFreshnessScore) / 2;
+
     const currentDishState = {
       name: dish.name,
       price: dish.price,
       ingredients: dish.ingredients,
       blockchainId: dish.blockchainId,
       timestamp: Date.now(),
+      qualityScore: dishQualityScore, 
     };
-
-    const ingredientHistories = await Promise.all(dish.ingredients.map(async (ingredientBlockchainId) => {
-      const ingredient = await Ingredient.findOne({ blockchainId: ingredientBlockchainId });
-      if (ingredient) {
-        const ingredientHistory = await foodQualityBlockchain.getTransactionByBlockchainId(ingredient.blockchainId);
-        const freshnessScore = calculateFreshnessScore(ingredient.expiryDate);
-        return {
-          ingredient,
-          previousState: ingredientHistory,
-          currentState: {
-            name: ingredient.name,
-            description: ingredient.description,
-            origin: ingredient.origin,
-            expiryDate: ingredient.expiryDate,
-            quantity: ingredient.quantity,
-            blockchainId: ingredient.blockchainId,
-            createdAt: ingredient.createdAt,
-            freshnessScore, 
-          },
-        };
-      }
-      return null;
-    }));
 
     const updatedFields = [];
     if (dishStateHistory.name !== currentDishState.name) updatedFields.push("name");
@@ -292,7 +306,7 @@ export const getDishHistory = async (req, res) => {
       blockchainTransaction: {
         ...currentDishState,
         action: "update",
-        qualityScore: dish.qualityScore,
+        qualityScore: dishQualityScore,
         updatedFields,
         previousState: {
           name: dishStateHistory.name,
