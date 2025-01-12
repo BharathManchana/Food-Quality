@@ -18,7 +18,8 @@ export const getBlockchainData = async (req, res) => {
         timestamp: transaction.timestamp,
         action: transaction.action || null,
         updatedFields: transaction.updatedFields || [],
-      }));
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp);
 
     res.status(200).json({
       message: 'All blockchain transactions fetched successfully.',
