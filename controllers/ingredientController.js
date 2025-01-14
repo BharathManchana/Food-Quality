@@ -1,6 +1,7 @@
 import Blockchain from '../blockchain/blockchain.js';
 import Ingredient from '../models/Ingredient.js';
 import crypto from 'crypto';
+import Rating from '../models/Rating.js';
 
 const foodQualityBlockchain = new Blockchain();
 
@@ -221,4 +222,69 @@ async function deleteIngredient(req, res) {
   }
 }
 
-export { addIngredient, getIngredients, getIngredientDetails, updateIngredient, deleteIngredient };
+async function submitRating(req, res) {
+  try {
+    const { dishId } = req.params;
+    const { foodQuality, taste, ingredientQuality } = req.body;
+
+    if (
+      !Number.isInteger(foodQuality) ||
+      foodQuality < 1 || foodQuality > 10 ||
+      !Number.isInteger(taste) ||
+      taste < 1 || taste > 10 ||
+      !Number.isInteger(ingredientQuality) ||
+      ingredientQuality < 1 || ingredientQuality > 10
+    ) {
+      return res.status(400).json({ message: 'Ratings must be integers between 1 and 10.' });
+    }
+
+    const newRating = new Rating({
+      dishId,
+      foodQuality,
+      taste,
+      ingredientQuality,
+    });
+
+    await newRating.save();
+
+    res.status(201).json({ message: 'Rating submitted successfully' });
+  } catch (error) {
+    console.error('Error submitting rating:', error);
+    res.status(500).json({ message: 'Error submitting rating.' });
+  }
+}
+
+async function getAverageRating(req, res) {
+  try {
+    const { dishId } = req.params;
+
+    const ratings = await Rating.find({ dishId });
+
+    if (ratings.length === 0) {
+      return res.status(404).json({ message: 'No ratings found for this dish.' });
+    }
+
+    const averageFoodQuality = ratings.reduce((acc, rating) => acc + rating.foodQuality, 0) / ratings.length;
+    const averageTaste = ratings.reduce((acc, rating) => acc + rating.taste, 0) / ratings.length;
+    const averageIngredientQuality = ratings.reduce((acc, rating) => acc + rating.ingredientQuality, 0) / ratings.length;
+
+    const percentageFoodQuality = (averageFoodQuality / 10) * 100;
+    const percentageTaste = (averageTaste / 10) * 100;
+    const correctPercentage = (averageIngredientQuality / 10) * 100;
+
+    res.status(200).json({
+      averageFoodQuality: percentageFoodQuality.toFixed(2),
+      averageTaste: percentageTaste.toFixed(2),
+      averageIngredientQuality: averageIngredientQuality.toFixed(2),
+      correctPercentage: correctPercentage.toFixed(2),
+    });
+  } catch (error) {
+    console.error('Error calculating average rating:', error);
+    res.status(500).json({ message: 'Error calculating average rating.' });
+  }
+}
+
+
+
+
+export { addIngredient, getIngredients, getIngredientDetails, updateIngredient, deleteIngredient ,submitRating,getAverageRating};
